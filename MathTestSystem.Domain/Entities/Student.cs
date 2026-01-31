@@ -2,10 +2,10 @@
 {
     public class Student : BaseEntity
     {
-        public string ExternalStudentId { get; private set; }
+        public string ExternalStudentId { get; set; } = string.Empty;
 
-        private readonly List<Exam> _exams = new();
-        public IReadOnlyCollection<Exam> Exams => _exams;
+        // Simplified: use a public list
+        public List<Exam> Exams { get; set; } = new();
 
         protected Student() { }
 
@@ -14,9 +14,6 @@
             ExternalStudentId = externalStudentId;
         }
 
-        public void AddExam(Exam exam)
-        {
-            _exams.Add(exam);
-        }
+        public void AddExam(Exam exam) => Exams.Add(exam);
     }
 }

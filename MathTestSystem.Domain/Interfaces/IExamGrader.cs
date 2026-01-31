@@ -1,10 +1,11 @@
 ﻿using MathTestSystem.Domain.Entities;
+using MathTestSystem.Domain.Enums;
 
 namespace MathTestSystem.Domain.Interfaces
 {
 
     public interface IExamGrader
     {
-        IReadOnlyCollection<TaskResult> GradeExam(Exam exam);
+        IReadOnlyCollection<GradingStatus> GradeExam(Exam exam);
     }
 }

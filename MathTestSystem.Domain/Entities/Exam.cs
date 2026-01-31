@@ -2,21 +2,18 @@
 {
     public class Exam : BaseEntity
     {
-        public string ExternalExamId { get; private set; }
+        public string ExternalExamId { get; set; } = string.Empty;
 
-        private readonly List<MathTask> _tasks = new();
-        public IReadOnlyCollection<MathTask> Tasks => _tasks;
+        // Simplified: use a public list so EF Core can map it
+        public List<MathTask> Tasks { get; set; } = new();
 
-        protected Exam() { }
+        protected Exam() { } // EF Core
 
         public Exam(string externalExamId)
         {
             ExternalExamId = externalExamId;
         }
 
-        public void AddTask(MathTask task)
-        {
-            _tasks.Add(task);
-        }
+        public void AddTask(MathTask task) => Tasks.Add(task);
     }
 }

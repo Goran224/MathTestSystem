@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="MathTestSystem.API/MathTestSystem.API.csproj" />
+  <Project Path="MathTestSystem.Application/MathTestSystem.Application.csproj" />
   <Project Path="MathTestSystem.Domain/MathTestSystem.Domain.csproj" />
+  <Project Path="MathTestSystem.Infrastructure/MathTestSystem.Infrastructure.csproj" />
 </Solution>

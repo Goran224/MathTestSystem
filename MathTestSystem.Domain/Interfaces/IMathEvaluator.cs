@@ -2,6 +2,6 @@
 {
     public interface IMathEvaluator
     {
-        decimal Evaluate(string expression);
+        Task<decimal> EvaluateAsync(string expression);
     }
 }
