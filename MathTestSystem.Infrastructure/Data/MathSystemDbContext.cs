@@ -10,8 +10,7 @@ public class MathSystemDbContext : DbContext
     public DbSet<Exam> Exams => Set<Exam>();
     public DbSet<MathTask> MathTasks => Set<MathTask>();
     public DbSet<TaskResult> TaskResults => Set<TaskResult>();
-
-    public DbSet<User> Users => Set<User>();    
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,8 +22,8 @@ public class MathSystemDbContext : DbContext
             entity.HasKey(s => s.Id);
             entity.Property(s => s.ExternalStudentId).IsRequired();
             entity.HasMany(s => s.Exams)
-                  .WithOne()
-                  .HasForeignKey("StudentId")
+                  .WithOne(e => e.Student)
+                  .HasForeignKey(e => e.StudentId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -39,13 +38,18 @@ public class MathSystemDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // MathTask
+        // MathTask -> TaskResults
         modelBuilder.Entity<MathTask>(entity =>
         {
             entity.HasKey(t => t.Id);
             entity.Property(t => t.ExternalTaskId).IsRequired();
             entity.Property(t => t.Expression).IsRequired();
             entity.Property(t => t.SubmittedResult).IsRequired();
+
+            entity.HasMany(t => t.TaskResults)
+                  .WithOne(tr => tr.MathTask)
+                  .HasForeignKey(tr => tr.MathTaskId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // TaskResult
@@ -54,14 +58,13 @@ public class MathSystemDbContext : DbContext
             entity.HasKey(tr => tr.Id);
             entity.Property(tr => tr.MathTaskId).IsRequired();
             entity.Property(tr => tr.ExpectedResult).IsRequired();
+            entity.Property(tr => tr.SubmittedResult).IsRequired();
             entity.Property(tr => tr.Status).IsRequired();
         });
-    
 
-    modelBuilder.Entity<User>(entity =>
+        // User
+        modelBuilder.Entity<User>(entity =>
         {
-            entity.ToTable("Users");
-
             entity.HasKey(u => u.Id);
             entity.Property(u => u.Username).IsRequired();
             entity.Property(u => u.PasswordHash).IsRequired();

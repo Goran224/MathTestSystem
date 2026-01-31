@@ -6,10 +6,12 @@
         public string Expression { get; set; } = string.Empty;
         public decimal SubmittedResult { get; set; }
 
-        public Guid ExamId { get; set; }  // FK to Exam
+        public Guid ExamId { get; set; }  // FK
         public Exam Exam { get; set; } = null!;
 
-        protected MathTask() { }
+        public List<TaskResult> TaskResults { get; set; } = new();
+
+        protected MathTask() { } // EF Core
 
         public MathTask(string externalTaskId, string expression, decimal submittedResult)
         {
@@ -17,5 +19,7 @@
             Expression = expression;
             SubmittedResult = submittedResult;
         }
+
+        public void AddTaskResult(TaskResult result) => TaskResults.Add(result);
     }
 }

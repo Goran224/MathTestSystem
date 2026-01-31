@@ -1,20 +1,23 @@
 ﻿using AutoMapper;
-using MathTestSystem.Application.DTOs;
+using MathTestSystem.Application.Contracts;
 using MathTestSystem.Domain.Entities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Student, StudentDto>()
-            .ForMember(dest => dest.Exams, opt => opt.MapFrom(src => src.Exams));
+        CreateMap<StudentXml, Student>()
+            .ConstructUsing(src => new Student(src.ID));
 
-        CreateMap<Exam, ExamDto>()
-            .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src.Tasks));
+        CreateMap<ExamXml, Exam>()
+            .ConstructUsing(src => new Exam(src.Id));
 
-        CreateMap<MathTask, TaskDto>();
-        CreateMap<ExamResultDto, ExamResultDto>();
-        CreateMap<TaskResultDto, TaskResultDto>();
+        CreateMap<TaskXml, MathTask>()
+      .ConstructUsing(src =>
+          new MathTask(
+              src.Id,
+              src.Value.Split('=')[0].Trim(),
+              decimal.Parse(src.Value.Split('=')[1].Trim())
+          ));
     }
 }

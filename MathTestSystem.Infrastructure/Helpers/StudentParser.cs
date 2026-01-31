@@ -1,68 +1,71 @@
-﻿using MathTestSystem.Domain.Entities;
+﻿using MathTestSystem.Application.Contracts;
+using MathTestSystem.Domain.Entities;
 using MathTestSystem.Domain.Interfaces;
-using System.Xml;
 
-namespace MathTestSystem.Infrastructure.Helpers
+public class StudentParser : IStudentParser
 {
-    public class StudentParser : IStudentParser
+    public Task<List<Student>> ParseStudentsAsync(TeacherXml teacherXml)
     {
-        public async Task<List<Student>> ParseStudentsAsync(string xml)
+        if (teacherXml?.Students == null)
+            return Task.FromResult(new List<Student>());
+
+        var students = new List<Student>();
+
+        foreach (var studentXml in teacherXml.Students) // ✅ direct iteration
         {
-            return await Task.Run(() =>
-            {
-                var students = new List<Student>();
-
-                var doc = new XmlDocument();
-                doc.LoadXml(xml);
-
-                var studentNodes = doc.SelectNodes("//Student");
-                if (studentNodes == null) return students;
-
-                foreach (XmlNode studentNode in studentNodes)
-                {
-                    var studentId = studentNode.Attributes?["ID"]?.Value;
-                    if (string.IsNullOrEmpty(studentId)) continue;
-
-                    var student = new Student(studentId);
-
-                    var examNodes = studentNode.SelectNodes("Exam");
-                    if (examNodes == null) continue;
-
-                    foreach (XmlNode examNode in examNodes)
-                    {
-                        var examId = examNode.Attributes?["Id"]?.Value;
-                        if (string.IsNullOrEmpty(examId)) continue;
-
-                        var exam = new Exam(examId);
-
-                        var taskNodes = examNode.SelectNodes("Task");
-                        if (taskNodes == null) continue;
-
-                        foreach (XmlNode taskNode in taskNodes)
-                        {
-                            var taskId = taskNode.Attributes?["id"]?.Value;
-                            var content = taskNode.InnerText;
-
-                            if (string.IsNullOrEmpty(taskId) || string.IsNullOrEmpty(content)) continue;
-
-                            var parts = content.Split('=');
-                            if (parts.Length != 2) continue;
-
-                            var expr = parts[0].Trim();
-                            var submitted = decimal.Parse(parts[1].Trim());
-
-                            var task = new MathTask(taskId, expr, submitted);
-                            exam.AddTask(task);
-                        }
-
-                        student.AddExam(exam);
-                    }
-
-                    students.Add(student);
-                }
-
-                return students;
-            });
+            var student = XmlMapper.MapToStudent(studentXml);
+            students.Add(student);
         }
+
+        return Task.FromResult(students);
+    }
+}
+
+// XML Mapper helper
+public static class XmlMapper
+{
+    public static Student MapToStudent(StudentXml studentXml)
+    {
+        var student = new Student(studentXml.ID.ToString()); // assuming domain wants string
+
+        if (studentXml.Exams != null)
+        {
+            foreach (var examXml in studentXml.Exams)
+            {
+                var exam = MapToExam(examXml);
+                student.AddExam(exam);
+            }
+        }
+
+        return student;
+    }
+
+    public static Exam MapToExam(ExamXml examXml)
+    {
+        var exam = new Exam(examXml.Id.ToString());
+
+        if (examXml.Tasks != null)
+        {
+            foreach (var taskXml in examXml.Tasks)
+            {
+                var task = MapToTask(taskXml);
+                exam.AddTask(task);
+            }
+        }
+
+        return exam;
+    }
+
+    public static MathTask MapToTask(TaskXml taskXml)
+    {
+        // parse expression and submitted result
+        var parts = taskXml.Value.Split('=');
+        if (parts.Length != 2)
+            return new MathTask(taskXml.Id.ToString(), taskXml.Value, 0); // fallback
+
+        var expression = parts[0].Trim();
+        var submitted = decimal.TryParse(parts[1].Trim(), out var r) ? r : 0;
+
+        return new MathTask(taskXml.Id.ToString(), expression, submitted);
     }
 }

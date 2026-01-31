@@ -1,8 +1,10 @@
-﻿using MathTestSystem.Application.DTOs;
+﻿using AutoMapper;
+using MathTestSystem.Application.DTOs;
 using MathTestSystem.Application.Interfaces;
 using MathTestSystem.Domain.Entities;
 using MathTestSystem.Domain.Enums;
 using MathTestSystem.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public class ExamProcessingService : IExamProcessingService
@@ -18,41 +20,38 @@ public class ExamProcessingService : IExamProcessingService
 
     public async Task<ExamResultDto> ProcessExamAsync(Exam exam)
     {
-        if (exam == null) throw new ArgumentNullException(nameof(exam));
-
-        var resultDto = new ExamResultDto { ExternalExamId = exam.ExternalExamId };
-
-        try
+        var result = new ExamResultDto
         {
-            foreach (var task in exam.Tasks)
+            ExternalExamId = exam.ExternalExamId
+        };
+
+        foreach (var task in exam.Tasks)
+        {
+            var expected = await _mathEvaluator.EvaluateAsync(task.Expression);
+
+            var status = expected == task.SubmittedResult
+                ? GradingStatus.Correct
+                : GradingStatus.Incorrect;
+
+            var taskResult = new TaskResult(
+                task.Id,
+                expected,
+                task.SubmittedResult,
+                status
+            );
+
+            task.AddTaskResult(taskResult);
+
+            result.TaskResults.Add(new TaskResultDto
             {
-                decimal expected;
-                try
-                {
-                    expected = await _mathEvaluator.EvaluateAsync(task.Expression);
-                }
-                catch (Exception evalEx)
-                {
-                    _logger.LogWarning(evalEx, "Failed to evaluate task {TaskId}", task.Id);
-                    expected = 0;
-                }
-
-                var taskResultDto = new TaskResultDto
-                {
-                    MathTaskId = task.Id,
-                    ExpectedResult = expected,
-                    Status = expected == task.SubmittedResult ? GradingStatus.Correct : GradingStatus.Incorrect
-                };
-
-                resultDto.AddTaskResult(taskResultDto);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Critical error processing exam {ExamId}", exam.ExternalExamId);
-            throw;
+                MathTaskId = task.Id,
+                Expression = task.Expression,
+                SubmittedResult = task.SubmittedResult,
+                ExpectedResult = expected,
+                Status = status
+            });
         }
 
-        return resultDto;
+        return result;
     }
 }

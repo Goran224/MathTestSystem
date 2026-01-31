@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddXmlSerializerFormatters();
 
 builder.Services.AddDbContext<MathSystemDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -26,7 +26,7 @@ builder.Services.AddScoped<IExamProcessingService, ExamProcessingService>();
 builder.Services.AddScoped<IMathEvaluator, MathEvaluator>();
 builder.Services.AddScoped<IStudentParser, StudentParser>();
 
-builder.Services.AddEndpointsApiExplorer(); ;
+builder.Services.AddEndpointsApiExplorer();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
