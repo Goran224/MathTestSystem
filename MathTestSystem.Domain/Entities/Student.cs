@@ -4,10 +4,11 @@
     {
         public string ExternalStudentId { get; set; } = string.Empty;
 
-        // EF Core friendly
+        public Guid TeacherId { get; set; }
+        public Teacher Teacher { get; set; } = null!;
         public List<Exam> Exams { get; set; } = new();
 
-        protected Student() { } // EF Core
+        protected Student() { } 
 
         public Student(string externalStudentId)
         {

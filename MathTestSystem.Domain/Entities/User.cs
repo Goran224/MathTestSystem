@@ -5,10 +5,10 @@ namespace MathTestSystem.Domain.Entities
     public class User : BaseEntity
     {
         public string Username { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty; // store hashed password
-        public UserRole Role { get; set; } // Teacher or Student
+        public string PasswordHash { get; set; } = string.Empty;
+        public UserRole Role { get; set; }
 
-        protected User() { } // EF Core
+        protected User() { } 
 
         public User(string username, string passwordHash, UserRole role)
         {

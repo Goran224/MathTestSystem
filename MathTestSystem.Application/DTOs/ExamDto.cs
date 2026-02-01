@@ -9,6 +9,6 @@ namespace MathTestSystem.Application.DTOs
 
         [Required]
         [MinLength(1)]
-        public List<TaskDto> Tasks { get; set; } = new();
+        public List<MathTaskDto> Tasks { get; set; } = new();
     }
 }

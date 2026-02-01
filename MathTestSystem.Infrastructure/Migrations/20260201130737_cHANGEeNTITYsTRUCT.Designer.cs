@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MathTestSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(MathSystemDbContext))]
-    [Migration("20260131174713_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260201130737_cHANGEeNTITYsTRUCT")]
+    partial class cHANGEeNTITYsTRUCT
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,7 @@ namespace MathTestSystem.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("StudentId")
+                    b.Property<Guid>("StudentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -53,6 +53,9 @@ namespace MathTestSystem.Infrastructure.Migrations
                     b.Property<Guid>("ExamId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("ExpectedResult")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Expression")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -61,8 +64,12 @@ namespace MathTestSystem.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("SubmittedResult")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
@@ -81,29 +88,29 @@ namespace MathTestSystem.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("MathTestSystem.Domain.Entities.TaskResult", b =>
+            modelBuilder.Entity("MathTestSystem.Domain.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("ExpectedResult")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("MathTaskId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("ExternalTeacherId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TaskResults");
+                    b.ToTable("Teachers");
                 });
 
             modelBuilder.Entity("MathTestSystem.Domain.Entities.User", b =>
@@ -125,15 +132,18 @@ namespace MathTestSystem.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("MathTestSystem.Domain.Entities.Exam", b =>
                 {
-                    b.HasOne("MathTestSystem.Domain.Entities.Student", null)
+                    b.HasOne("MathTestSystem.Domain.Entities.Student", "Student")
                         .WithMany("Exams")
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("MathTestSystem.Domain.Entities.MathTask", b =>
@@ -147,6 +157,17 @@ namespace MathTestSystem.Infrastructure.Migrations
                     b.Navigation("Exam");
                 });
 
+            modelBuilder.Entity("MathTestSystem.Domain.Entities.Student", b =>
+                {
+                    b.HasOne("MathTestSystem.Domain.Entities.Teacher", "Teacher")
+                        .WithMany("Students")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("MathTestSystem.Domain.Entities.Exam", b =>
                 {
                     b.Navigation("Tasks");
@@ -155,6 +176,11 @@ namespace MathTestSystem.Infrastructure.Migrations
             modelBuilder.Entity("MathTestSystem.Domain.Entities.Student", b =>
                 {
                     b.Navigation("Exams");
+                });
+
+            modelBuilder.Entity("MathTestSystem.Domain.Entities.Teacher", b =>
+                {
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

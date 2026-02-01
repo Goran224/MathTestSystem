@@ -6,35 +6,21 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MathTestSystem.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class cHANGEeNTITYsTRUCTURE : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "Teachers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExternalStudentId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ExternalTeacherId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TaskResults",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MathTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExpectedResult = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TaskResults", x => x.Id);
+                    table.PrimaryKey("PK_Teachers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,12 +38,31 @@ namespace MathTestSystem.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExternalStudentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Students_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Exams",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExternalExamId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,7 +82,9 @@ namespace MathTestSystem.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExternalTaskId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Expression = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SubmittedResult = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SubmittedResult = table.Column<decimal>(type: "decimal(10,2)", precision: 18, scale: 6, nullable: false),
+                    ExpectedResult = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     ExamId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -100,6 +107,11 @@ namespace MathTestSystem.Infrastructure.Migrations
                 name: "IX_MathTasks_ExamId",
                 table: "MathTasks",
                 column: "ExamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_TeacherId",
+                table: "Students",
+                column: "TeacherId");
         }
 
         /// <inheritdoc />
@@ -109,9 +121,6 @@ namespace MathTestSystem.Infrastructure.Migrations
                 name: "MathTasks");
 
             migrationBuilder.DropTable(
-                name: "TaskResults");
-
-            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
@@ -119,6 +128,9 @@ namespace MathTestSystem.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Teachers");
         }
     }
 }

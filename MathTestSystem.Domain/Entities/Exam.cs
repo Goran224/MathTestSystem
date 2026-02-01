@@ -4,13 +4,12 @@
     {
         public string ExternalExamId { get; set; } = string.Empty;
 
-        // EF Core friendly
         public List<MathTask> Tasks { get; set; } = new();
 
         public Guid StudentId { get; set; }  // FK
         public Student Student { get; set; } = null!;
 
-        protected Exam() { } // EF Core
+        protected Exam() { } 
 
         public Exam(string externalExamId)
         {

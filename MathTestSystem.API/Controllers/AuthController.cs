@@ -1,7 +1,6 @@
 ﻿using MathTestSystem.Application.DTOs;
 using MathTestSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 [ApiController]
 [Route("api/[controller]")]
