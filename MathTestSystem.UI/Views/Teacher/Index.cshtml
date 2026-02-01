@@ -1,30 +1,97 @@
 ﻿@model List<MathTestSystem.Shared.DTOs.ExamDto>
 
-<h2>Teacher Dashboard</h2>
+@{
+    ViewData["Title"] = "Teacher Dashboard";
+    Layout = "_Layout";
+}
 
-<a asp-action="UploadXml">Upload XML</a>
+<style>
+    .exam-card {
+        border: 1px solid #e6e6e6;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 14px;
+        background: #fff;
+    }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Exam ID</th>
-            <th>Tasks</th>
-        </tr>
-    </thead>
-    <tbody>
+    .exam-header {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        margin-bottom:10px;
+    }
+
+    .exam-meta {
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+    table.exams-table {
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    table.exams-table th, table.exams-table td {
+        padding:12px 14px; /* increased spacing */
+        border-bottom:1px solid #f1f1f1;
+        text-align:left;
+    }
+</style>
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.Error))
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+@if (!string.IsNullOrEmpty(ViewBag.Message))
+{
+    <div class="alert alert-success">@ViewBag.Message</div>
+}
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No exams found.</div>
+}
+else
+{
+    <div>
         @foreach (var exam in Model)
         {
-            <tr>
-                <td>@exam.ExternalExamId</td>
-                <td>
-                    <ul>
-                        @foreach (var task in exam.Tasks)
+            <section class="exam-card">
+                <div class="exam-header">
+                    <div>
+                        <strong>Exam:</strong> @exam.ExternalExamId
+                        <div class="exam-meta">Student: @exam.StudentExternalId</div>
+                    </div>
+                    <div>
+                        <span class="badge" style="background:#0d6efd">Tasks: @exam.Tasks?.Count</span>
+                    </div>
+                </div>
+
+                <table class="exams-table" aria-labelledby="exam-@exam.ExternalExamId">
+                    <thead>
+                        <tr>
+                            <th>Expression</th>
+                            <th style="width:140px">Submitted</th>
+                            <th style="width:140px">Expected</th>
+                            <th style="width:160px">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in exam.Tasks)
                         {
-                            <li>@task.Expression = @task.SubmittedResult (Expected: @task.ExpectedResult) - @task.Status</li>
+                            <tr>
+                                <td>@t.Expression</td>
+                                <td>@t.SubmittedResult</td>
+                                <td>@t.ExpectedResult</td>
+                                <td>@t.Status</td>
+                            </tr>
                         }
-                    </ul>
-                </td>
-            </tr>
+                    </tbody>
+                </table>
+            </section>
         }
-    </tbody>
-</table>
+    </div>
+}

@@ -1,0 +1,137 @@
+﻿@model List<MathTestSystem.Shared.DTOs.ExamDto>
+
+@{
+    ViewData["Title"] = "My Exams";
+    Layout = "_Layout";
+}
+
+<style>
+    .exams-container {
+        max-width: 980px;
+        margin: 20px auto;
+        padding: 8px;
+    }
+
+    .exam-card {
+        border: 1px solid #e6e6e6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 18px;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(16,24,40,0.03);
+    }
+
+    .exam-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .status-passed {
+        background: #198754;
+    }
+
+    .status-failed {
+        background: #dc3545;
+    }
+
+    .status-partial {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    table.exams-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        table.exams-table th, table.exams-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f1f1;
+            text-align: left;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 28px;
+        color: #6b7280;
+        background: #fbfbfb;
+        border: 1px dashed #e6e6e6;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="exams-container">
+    <h2>@ViewData["Title"]</h2>
+
+    @if (!string.IsNullOrEmpty(ViewBag.Error))
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty-state">
+            <p>You have no exams yet.</p>
+            <p>If your teacher uploaded exams, contact them to verify your student id.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var exam in Model)
+        {
+            <section class="exam-card">
+                <div class="exam-header">
+                    <div>
+                        <strong>Exam:</strong> @exam.ExternalExamId
+                    </div>
+                    <div>
+                        <span class="badge" style="background:#0d6efd">Tasks: @exam.Tasks?.Count</span>
+                    </div>
+                </div>
+
+                <table class="exams-table" aria-labelledby="exam-@exam.ExternalExamId">
+                    <thead>
+                        <tr>
+                            <th>Expression</th>
+                            <th style="width:110px">Submitted</th>
+                            <th style="width:110px">Expected</th>
+                            <th style="width:140px">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in exam.Tasks)
+                        {
+                            var statusClass = task.Status switch
+                            {
+                                MathTestSystem.Domain.Enums.GradingStatus.Correct => "status-passed",
+                                MathTestSystem.Domain.Enums.GradingStatus.Incorrect => "status-failed",
+                                MathTestSystem.Domain.Enums.GradingStatus.Pending => "status-partial",
+                                _ => "status-partial"
+                            };
+
+                            <tr>
+                                <td>@task.Expression</td>
+                                <td>@task.SubmittedResult</td>
+                                <td>@task.ExpectedResult</td>
+                                <td>
+                                    <span class="badge @statusClass">@task.Status</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        }
+    }
+</div>

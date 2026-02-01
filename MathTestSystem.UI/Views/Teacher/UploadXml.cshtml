@@ -1,11 +1,33 @@
-﻿<h2>Upload XML</h2>
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Upload XML";
+}
 
-<form asp-action="UploadXml" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" />
-    <button type="submit">Upload</button>
-</form>
+<h2>Upload XML</h2>
 
 @if (TempData["Message"] != null)
 {
-    <p>@TempData["Message"]</p>
+    <div class="alert alert-success">@TempData["Message"]</div>
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@err.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="UploadXml" method="post" enctype="multipart/form-data">
+    <div class="mb-2">
+        <input type="file" name="file" />
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>

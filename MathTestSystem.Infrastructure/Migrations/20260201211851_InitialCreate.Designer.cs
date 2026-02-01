@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MathTestSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(MathSystemDbContext))]
-    [Migration("20260201130737_cHANGEeNTITYsTRUCT")]
-    partial class cHANGEeNTITYsTRUCT
+    [Migration("20260201211851_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -118,6 +118,9 @@ namespace MathTestSystem.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()

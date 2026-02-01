@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MathTestSystem.Shared.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MathTestSystem.Shared.DTOs;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 [Authorize(Roles = "Teacher")]
 public class TeacherController : Controller
@@ -29,7 +32,16 @@ public class TeacherController : Controller
     {
         try
         {
-            var teacherId = User.Claims.First(c => c.Type == "UserId").Value;
+            var teacherId = User.FindFirstValue("ExternalId") ?? User.FindFirstValue("UserId");
+            if (string.IsNullOrWhiteSpace(teacherId))
+            {
+                _logger.LogWarning("Teacher user has no ExternalId or UserId claim");
+                return Challenge();
+            }
+
+            var token = Request.Cookies["AuthToken"];
+            if (!string.IsNullOrWhiteSpace(token))
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var response = await _httpClient.GetAsync($"/api/exam/teacher/{teacherId}");
 
@@ -42,8 +54,17 @@ public class TeacherController : Controller
 
             var json = await response.Content.ReadAsStringAsync();
 
-            var exams = JsonSerializer.Deserialize<List<ExamDto>>(json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            jsonOptions.Converters.Add(new JsonStringEnumConverter());
+
+            var exams = JsonSerializer.Deserialize<List<ExamDto>>(json, jsonOptions);
+
+            ViewBag.Message = TempData["Message"];
+            ViewBag.Error = TempData["Error"] ?? ViewBag.Error;
 
             return View(exams);
         }
@@ -55,13 +76,11 @@ public class TeacherController : Controller
         }
     }
 
-    // GET: /Teacher/UploadXml
     public IActionResult UploadXml()
     {
         return View();
     }
 
-    // POST: /Teacher/UploadXml
     [HttpPost]
     public async Task<IActionResult> UploadXml(IFormFile file)
     {
@@ -73,6 +92,10 @@ public class TeacherController : Controller
                 return View();
             }
 
+            var token = Request.Cookies["AuthToken"];
+            if (!string.IsNullOrWhiteSpace(token))
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             using var content = new MultipartFormDataContent();
             using var stream = file.OpenReadStream();
 
@@ -83,17 +106,18 @@ public class TeacherController : Controller
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogWarning("XML upload failed with status {StatusCode}", response.StatusCode);
-                ModelState.AddModelError("", "Failed to upload XML.");
+                TempData["Error"] = "Failed to upload XML.";
                 return View();
             }
 
             TempData["Message"] = "XML uploaded successfully!";
-            return RedirectToAction(nameof(Index));
+            ModelState.Clear(); 
+            return View();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while uploading XML");
-            ModelState.AddModelError("", "Unexpected error while uploading file.");
+            TempData["Error"] = "Unexpected error while uploading file.";
             return View();
         }
     }

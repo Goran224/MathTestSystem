@@ -6,6 +6,7 @@ using MathTestSystem.Domain.Interfaces;
 using MathTestSystem.Infrastructure.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Xml.Serialization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -29,13 +30,23 @@ public class ExamController : ControllerBase
         _logger = logger;
     }
 
+    // Accept multipart/form-data with an uploaded XML file.
     [HttpPost("upload")]
     [Authorize(Roles = "Teacher")]
-    [Consumes("application/xml")]
-    public async Task<IActionResult> UploadExam([FromBody] TeacherXml teacherXml)
+    public async Task<IActionResult> UploadExam([FromForm] IFormFile file)
     {
+        if (file == null || file.Length == 0)
+            return BadRequest("File is required");
+
         try
         {
+            TeacherXml teacherXml;
+            var serializer = new XmlSerializer(typeof(TeacherXml));
+            using (var stream = file.OpenReadStream())
+            {
+                teacherXml = (TeacherXml?)serializer.Deserialize(stream) ?? throw new InvalidOperationException("Invalid XML");
+            }
+
             if (teacherXml?.Students == null || !teacherXml.Students.Any())
                 return BadRequest("No students found in XML");
 
@@ -55,15 +66,7 @@ public class ExamController : ControllerBase
                 }
             }
 
-            try
-            {
-                await _examRepository.SaveTeacherTreeAsync(teacher);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error saving teacher tree {TeacherId}", teacher.Id);
-                throw;
-            }
+            await _examRepository.SaveTeacherTreeAsync(teacher);
 
             var results = new List<ExamResultDto>();
             foreach (var student in teacher.Students)
@@ -83,6 +86,11 @@ public class ExamController : ControllerBase
             }
 
             return Ok(results);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid XML uploaded");
+            return BadRequest("Uploaded file is not valid XML or does not match expected schema.");
         }
         catch (Exception ex)
         {

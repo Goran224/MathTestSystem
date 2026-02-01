@@ -3,6 +3,7 @@ using MathTestSystem.Shared.Interfaces;
 using MathTestSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace MathTestSystem.Infrastructure.Repositories
 {
@@ -26,34 +27,32 @@ namespace MathTestSystem.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-
                 _logger.LogError(ex, "Error Save Teacher Tree Async student");
                 throw;
             }
         }
+
         public async Task<List<ExamDto>> GetAllExamsAsync()
         {
             try
             {
-                var exams = await _context.Exams
+                return await _context.Exams
+                    .AsNoTracking()
                     .Include(e => e.Tasks)
                     .Include(e => e.Student)
-                        .ThenInclude(s => s.Teacher)
-                    .ToListAsync();
-
-                var examDtos = exams.Select(e => new ExamDto
-                {
-                    ExternalExamId = e.ExternalExamId,
-                    Tasks = e.Tasks.Select(t => new MathTaskDto
+                    .Select(e => new ExamDto
                     {
-                        ExpectedResult = t.ExpectedResult,
-                        Expression = t.Expression,
-                        SubmittedResult = t.SubmittedResult,
-                        Status = t.Status
-                    }).ToList()
-                }).ToList();
-
-                return examDtos;
+                        ExternalExamId = e.ExternalExamId,
+                        StudentExternalId = e.Student.ExternalStudentId,
+                        Tasks = e.Tasks.Select(t => new MathTaskDto
+                        {
+                            ExpectedResult = t.ExpectedResult,
+                            Expression = t.Expression,
+                            SubmittedResult = t.SubmittedResult,
+                            Status = t.Status
+                        }).ToList()
+                    })
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -66,24 +65,38 @@ namespace MathTestSystem.Infrastructure.Repositories
         {
             try
             {
-                var exams = await _context.Exams
+                var isGuid = Guid.TryParse(externalStudentId, out var studentGuid);
+
+                var query = _context.Exams
+                    .AsNoTracking()
                     .Include(e => e.Tasks)
                     .Include(e => e.Student)
                         .ThenInclude(s => s.Teacher)
-                    .Where(e => e.Student.ExternalStudentId == externalStudentId)
-                    .ToListAsync();
+                    .AsQueryable();
 
-                return exams.Select(e => new ExamDto
+                if (isGuid)
                 {
-                    ExternalExamId = e.ExternalExamId,
-                    Tasks = e.Tasks.Select(t => new MathTaskDto
+                    query = query.Where(e => e.StudentId == studentGuid || e.Student.ExternalStudentId == externalStudentId);
+                }
+                else
+                {
+                    query = query.Where(e => e.Student.ExternalStudentId == externalStudentId);
+                }
+
+                return await query
+                    .Select(e => new ExamDto
                     {
-                        ExpectedResult = t.ExpectedResult,
-                        Expression = t.Expression,
-                        SubmittedResult = t.SubmittedResult,
-                        Status = t.Status
-                    }).ToList()
-                }).ToList();
+                        ExternalExamId = e.ExternalExamId,
+                        StudentExternalId = e.Student.ExternalStudentId,
+                        Tasks = e.Tasks.Select(t => new MathTaskDto
+                        {
+                            ExpectedResult = t.ExpectedResult,
+                            Expression = t.Expression,
+                            SubmittedResult = t.SubmittedResult,
+                            Status = t.Status
+                        }).ToList()
+                    })
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -96,24 +109,38 @@ namespace MathTestSystem.Infrastructure.Repositories
         {
             try
             {
-                var exams = await _context.Exams
+                var isGuid = Guid.TryParse(externalTeacherId, out var teacherGuid);
+
+                var query = _context.Exams
+                    .AsNoTracking()
                     .Include(e => e.Tasks)
                     .Include(e => e.Student)
                         .ThenInclude(s => s.Teacher)
-                    .Where(e => e.Student.Teacher.ExternalTeacherId == externalTeacherId)
-                    .ToListAsync();
+                    .AsQueryable();
 
-                return exams.Select(e => new ExamDto
+                if (isGuid)
                 {
-                    ExternalExamId = e.ExternalExamId,
-                    Tasks = e.Tasks.Select(t => new MathTaskDto
+                    query = query.Where(e => e.Student.Teacher.Id == teacherGuid || e.Student.Teacher.ExternalTeacherId == externalTeacherId);
+                }
+                else
+                {
+                    query = query.Where(e => e.Student.Teacher.ExternalTeacherId == externalTeacherId);
+                }
+
+                return await query
+                    .Select(e => new ExamDto
                     {
-                        ExpectedResult = t.ExpectedResult,
-                        Expression = t.Expression,
-                        SubmittedResult = t.SubmittedResult,
-                        Status = t.Status
-                    }).ToList()
-                }).ToList();
+                        ExternalExamId = e.ExternalExamId,
+                        StudentExternalId = e.Student.ExternalStudentId,
+                        Tasks = e.Tasks.Select(t => new MathTaskDto
+                        {
+                            ExpectedResult = t.ExpectedResult,
+                            Expression = t.Expression,
+                            SubmittedResult = t.SubmittedResult,
+                            Status = t.Status
+                        }).ToList()
+                    })
+                    .ToListAsync();
             }
             catch (Exception ex)
             {

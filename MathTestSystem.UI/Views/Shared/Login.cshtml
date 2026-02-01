@@ -1,27 +1,116 @@
-﻿@model MathTestSystem.UI.Models.LoginViewModel
+﻿
+@model MathTestSystem.UI.Models.LoginViewModel
 @{
     ViewData["Title"] = "Login";
     Layout = "_Layout";
 }
 
-<h2>Login</h2>
+<style>
+    .login-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+    }
 
-<form asp-action="Login" method="post">
-    <div class="form-group">
-        <label asp-for="Username"></label>
-        <input asp-for="Username" class="form-control" />
-        <span asp-validation-for="Username" class="text-danger"></span>
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        background: #ffffff;
+        border: 1px solid #e6e6e6;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 6px 18px rgba(29, 41, 66, 0.06);
+    }
+
+        .login-card h2 {
+            margin-bottom: 18px;
+            font-size: 1.5rem;
+            color: #1f2d3d;
+            text-align: center;
+        }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #dcdcdc;
+        border-radius: 6px;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 10px 12px;
+        background: #1b6ec2;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .validation-summary-errors {
+        margin-bottom: 12px;
+    }
+
+    .help-block {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+</style>
+
+<div class="login-page">
+    <div class="login-card" role="main" aria-labelledby="loginTitle">
+        <h2 id="loginTitle">Sign in to MathTestSystem</h2>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
+        }
+
+        <form id="loginForm" asp-controller="Account" asp-action="Login" method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="ReturnUrl" value="@(Context.Request?.Query["ReturnUrl"].ToString() ?? string.Empty)" />
+
+            <div asp-validation-summary="All" class="text-danger validation-summary-errors"></div>
+
+            <div class="form-group">
+                <label asp-for="Username" class="help-block"></label>
+                <input asp-for="Username" class="form-control" autofocus />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="help-block"></label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn-login">Login</button>
+        </form>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-2">Login</button>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Use the explicit form id and jQuery validation if available.
+        (function () {
+            const formSelector = '#loginForm';
+            if (window.jQuery && $(formSelector).length && typeof $(formSelector).valid === 'function') {
+                $(formSelector).on('submit', function (e) {
+                    if (!$(this).valid()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            // If jQuery isn't present, leave server-side validation to handle it.
+        })();
+    </script>
 }

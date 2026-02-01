@@ -24,33 +24,47 @@ namespace MathTestSystem.Infrastructure.Services
         public async Task<string> AuthenticateAsync(string username, string password)
         {
             var hash = HashPassword(password);
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username && u.PasswordHash == hash);
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Username == username && u.PasswordHash == hash);
+
             if (user == null) return null!;
 
-            return GenerateJwtToken(user);
+            // ExternalId is now stored directly on the User (Option A)
+            var externalId = user.ExternalId;
+
+            return GenerateJwtToken(user, externalId);
         }
 
         public async Task<UserDto?> GetUserByUsernameAsync(string username)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Username == username);
             if (user == null) return null;
 
             return new UserDto
             {
                 Id = user.Id,
                 Username = user.Username,
-                Role = user.Role.ToString()
+                Role = user.Role,
+                ExternalId = user.ExternalId
             };
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(User user, string? externalId = null)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
                 new Claim("UserId", user.Id.ToString())
             };
+
+            if (!string.IsNullOrWhiteSpace(externalId))
+            {
+                claims.Add(new Claim("ExternalId", externalId));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
