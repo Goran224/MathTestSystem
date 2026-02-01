@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace MathTestSystem.Application.Contracts
+namespace MathTestSystem.Shared.Contracts
 {
     public class ExamXml
     {

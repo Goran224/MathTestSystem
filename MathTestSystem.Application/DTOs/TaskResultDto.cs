@@ -1,6 +1,6 @@
 ﻿using MathTestSystem.Domain.Enums;
 
-namespace MathTestSystem.Application.DTOs
+namespace MathTestSystem.Shared.DTOs
 {
     public class TaskResultDto
     {

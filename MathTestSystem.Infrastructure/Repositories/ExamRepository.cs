@@ -1,6 +1,5 @@
-﻿using MathTestSystem.Application.Contracts;
-using MathTestSystem.Application.DTOs;
-using MathTestSystem.Application.Interfaces;
+﻿using MathTestSystem.Shared.DTOs;
+using MathTestSystem.Shared.Interfaces;
 using MathTestSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MathTestSystem.Application.DTOs
+namespace MathTestSystem.Shared.DTOs
 {
     public class StudentDto
     {

@@ -1,5 +1,5 @@
-﻿using MathTestSystem.Application.DTOs;
-using MathTestSystem.Application.Interfaces;
+﻿using MathTestSystem.Shared.DTOs;
+using MathTestSystem.Shared.Interfaces;
 using MathTestSystem.Domain.Entities;
 using MathTestSystem.Domain.Enums;
 using MathTestSystem.Domain.Interfaces;

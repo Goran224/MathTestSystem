@@ -1,6 +1,8 @@
-﻿using MathTestSystem.Application.DTOs;
-using MathTestSystem.Application.Interfaces;
+﻿using MathTestSystem.Shared.DTOs;
+using MathTestSystem.Shared.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -34,6 +36,28 @@ public class AuthController : ControllerBase
         {
             _logger.LogError(ex, "Unexpected error during login for user {Username}", login.Username);
             return StatusCode(500, "An unexpected error occurred");
+        }
+    }
+
+    [HttpGet("me")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<IActionResult> Me()
+    {
+        try
+        {
+            // Get username from JWT
+            var username = User.FindFirstValue(ClaimTypes.Name);
+            if (string.IsNullOrEmpty(username)) return Unauthorized();
+
+            var user = await _authService.GetUserByUsernameAsync(username);
+            if (user == null) return NotFound();
+
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching user info");
+            return StatusCode(500, "Internal server error");
         }
     }
 }

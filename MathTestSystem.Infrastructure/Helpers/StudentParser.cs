@@ -1,7 +1,7 @@
-﻿using MathTestSystem.Application.Contracts;
+﻿using MathTestSystem.Shared.Contracts;
 using MathTestSystem.Domain.Entities;
-using MathTestSystem.Domain.Interfaces;
 using MathTestSystem.Infrastructure.Helpers;
+using MathTestSystem.Shared.Interfaces;
 
 public class StudentParser : IStudentParser
 {

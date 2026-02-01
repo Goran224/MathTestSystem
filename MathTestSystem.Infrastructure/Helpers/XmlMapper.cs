@@ -1,6 +1,6 @@
 ﻿namespace MathTestSystem.Infrastructure.Helpers
 {
-    using MathTestSystem.Application.Contracts;
+    using MathTestSystem.Shared.Contracts;
     using MathTestSystem.Domain.Entities;
 
     public static class XmlMapper

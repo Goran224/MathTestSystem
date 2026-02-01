@@ -1,5 +1,6 @@
-﻿using MathTestSystem.Application.Interfaces;
-using MathTestSystem.Domain.Entities;
+﻿using MathTestSystem.Domain.Entities;
+using MathTestSystem.Shared.DTOs;
+using MathTestSystem.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +28,19 @@ namespace MathTestSystem.Infrastructure.Services
             if (user == null) return null!;
 
             return GenerateJwtToken(user);
+        }
+
+        public async Task<UserDto?> GetUserByUsernameAsync(string username)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return null;
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Role = user.Role.ToString()
+            };
         }
 
         private string GenerateJwtToken(User user)

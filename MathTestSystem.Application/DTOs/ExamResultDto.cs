@@ -1,4 +1,4 @@
-﻿namespace MathTestSystem.Application.DTOs
+﻿namespace MathTestSystem.Shared.DTOs
 {
     public class ExamResultDto
     {

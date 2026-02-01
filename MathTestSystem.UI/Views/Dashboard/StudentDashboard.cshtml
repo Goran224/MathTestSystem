@@ -1,0 +1,28 @@
+﻿@model List<MathTestSystem.Shared.DTOs.ExamDto>
+
+<h2>My Exams</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Exam ID</th>
+            <th>Tasks</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model)
+        {
+            <tr>
+                <td>@exam.ExternalExamId</td>
+                <td>
+                    <ul>
+                        @foreach (var task in exam.Tasks)
+                        {
+                            <li>@task.Expression = @task.SubmittedResult (Expected: @task.ExpectedResult) - @task.Status</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,5 +1,5 @@
 using MathTestSystem.API.Extensions;
-using MathTestSystem.Application.Interfaces;
+using MathTestSystem.Shared.Interfaces;
 using MathTestSystem.Domain.Interfaces;
 using MathTestSystem.Infrastructure.Helpers;
 using MathTestSystem.Infrastructure.Repositories;

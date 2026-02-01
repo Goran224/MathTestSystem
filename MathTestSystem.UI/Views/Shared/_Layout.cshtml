@@ -1,0 +1,56 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MathTestSystem</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="@Url.Action("Index", "Home")">Home</a>
+
+            @if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            {
+                var role = HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+
+                @* Teacher Dashboard link *@
+                @if (role == "Teacher")
+                {
+                    <a href="@Url.Action("TeacherDashboard", "Teacher")">Dashboard</a>
+                    <a href="@Url.Action("UploadXml", "Teacher")">Upload XML</a>
+                }
+
+                @* Student Dashboard link *@
+                @if (role == "Student")
+                {
+                    <a href="@Url.Action("StudentDashboard", "Student")">Dashboard</a>
+                }
+
+                <form method="post" asp-controller="Account" asp-action="Logout" style="display:inline">
+                    <button type="submit">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account")">Login</a>
+            }
+        </nav>
+    </header>
+
+    <main role="main" class="container">
+        @RenderBody()
+    </main>
+
+    <footer>
+        <p>&copy; 2026 MathTestSystem</p>
+    </footer>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

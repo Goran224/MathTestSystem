@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MathTestSystem.Application\MathTestSystem.Application.csproj" />
+    <ProjectReference Include="..\MathTestSystem.Application\MathTestSystem.Shared.csproj" />
     <ProjectReference Include="..\MathTestSystem.Domain\MathTestSystem.Domain.csproj" />
   </ItemGroup>
 
