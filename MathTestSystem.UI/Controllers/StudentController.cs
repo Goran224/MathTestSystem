@@ -1,8 +1,6 @@
 ﻿using MathTestSystem.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
@@ -29,7 +27,7 @@ public class StudentController : Controller
     {
         try
         {
-            // Prefer ExternalId claim (mapped to Student.ExternalStudentId), fallback to UserId
+
             var externalStudentId = User.FindFirstValue("ExternalId") ?? User.FindFirstValue("UserId");
             if (string.IsNullOrWhiteSpace(externalStudentId))
             {
@@ -61,7 +59,7 @@ public class StudentController : Controller
             {
                 PropertyNameCaseInsensitive = true
             };
-            // Ensure enum values serialized as strings ("Correct","Incorrect",...) deserialize correctly
+
             jsonOptions.Converters.Add(new JsonStringEnumConverter());
 
             var exams = JsonSerializer.Deserialize<List<ExamDto>>(json, jsonOptions)

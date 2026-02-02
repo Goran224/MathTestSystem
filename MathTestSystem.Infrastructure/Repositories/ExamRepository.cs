@@ -1,9 +1,8 @@
-﻿using MathTestSystem.Shared.DTOs;
+﻿using MathTestSystem.Domain.Entities;
+using MathTestSystem.Shared.DTOs;
 using MathTestSystem.Shared.Interfaces;
-using MathTestSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace MathTestSystem.Infrastructure.Repositories
 {

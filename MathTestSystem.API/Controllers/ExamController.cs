@@ -1,9 +1,8 @@
-﻿using MathTestSystem.Shared.Contracts;
+﻿using MathTestSystem.Domain.Entities;
+using MathTestSystem.Infrastructure.Helpers;
+using MathTestSystem.Shared.Contracts;
 using MathTestSystem.Shared.DTOs;
 using MathTestSystem.Shared.Interfaces;
-using MathTestSystem.Domain.Entities;
-using MathTestSystem.Domain.Interfaces;
-using MathTestSystem.Infrastructure.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Serialization;
