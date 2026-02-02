@@ -12,7 +12,7 @@ public class StudentParser : IStudentParser
 
         var students = new List<Student>();
 
-        foreach (var studentXml in teacherXml.Students) // ✅ direct iteration
+        foreach (var studentXml in teacherXml.Students)
         {
             var student = XmlMapper.MapToStudent(studentXml);
             students.Add(student);

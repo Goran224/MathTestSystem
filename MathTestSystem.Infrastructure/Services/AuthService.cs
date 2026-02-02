@@ -30,7 +30,6 @@ namespace MathTestSystem.Infrastructure.Services
 
             if (user == null) return null!;
 
-            // ExternalId is now stored directly on the User (Option A)
             var externalId = user.ExternalId;
 
             return GenerateJwtToken(user, externalId);

@@ -26,7 +26,7 @@ namespace MathTestSystem.Infrastructure.Helpers
                 teacher.Students.Add(studentB);
 
                 var exam1 = new Exam("24C41807-D220-4061-B0DB-3EA1E1EA5196");
-                exam1.AddTask(new MathTask(Guid.NewGuid().ToString(), "2+3/6-4", 74m) { ExpectedResult = 74m, Status = GradingStatus.Correct });
+                exam1.AddTask(new MathTask(Guid.NewGuid().ToString(), "2+3/6-4", 1.5m) { ExpectedResult = 1.5m, Status = GradingStatus.Correct });
                 exam1.AddTask(new MathTask(Guid.NewGuid().ToString(), "5*3+1", 16m) { ExpectedResult = 16m, Status = GradingStatus.Correct });
                 studentA.AddExam(exam1);
 
@@ -59,7 +59,6 @@ namespace MathTestSystem.Infrastructure.Helpers
 
             if (!await context.Users.AnyAsync(u => u.Username == "student1"))
             {
-                // map student1 to one of seeded students (54321)
                 var studentEntity = await context.Students.FirstOrDefaultAsync(s => s.ExternalStudentId == "54321");
                 var studentExternal = studentEntity?.ExternalStudentId ?? "54321";
 

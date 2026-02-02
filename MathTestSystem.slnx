@@ -3,5 +3,6 @@
   <Project Path="MathTestSystem.Application/MathTestSystem.Shared.csproj" />
   <Project Path="MathTestSystem.Domain/MathTestSystem.Domain.csproj" />
   <Project Path="MathTestSystem.Infrastructure/MathTestSystem.Infrastructure.csproj" />
+  <Project Path="MathTestSystem.Tests/MathTestSystem.Tests.csproj" Id="5175e9c3-d8df-40e4-855b-87fbad9fcec2" />
   <Project Path="MathTestSystem.UI/MathTestSystem.UI.csproj" Id="6e2a48e1-b618-47df-ab69-e5556b9f71a5" />
 </Solution>

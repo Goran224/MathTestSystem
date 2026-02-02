@@ -30,7 +30,7 @@ public class ExamController : ControllerBase
         _logger = logger;
     }
 
-    // Accept multipart/form-data with an uploaded XML file.
+
     [HttpPost("upload")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> UploadExam([FromForm] IFormFile file)
